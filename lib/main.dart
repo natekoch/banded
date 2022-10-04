@@ -1,95 +1,42 @@
 import 'package:flutter/material.dart';
 
+// Import the firebase_core plugin
+import 'package:firebase_core/firebase_core.dart';
+
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  static const String _title = 'banded';
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Welcome to Banded',
-      home: HomeWidget(),
-    );
-  }
-}
+    return FutureBuilder(
+      // Initialize FlutterFire:
+      future: _initialization,
+      builder: (context, snapshot) {
+        // Check for errors
+        if (snapshot.hasError) {
+          return const Text('error', textDirection: TextDirection.ltr);
+        }
 
-class HomeWidget extends StatefulWidget {
-  const HomeWidget({super.key});
+        // Once complete, show your application
+        if (snapshot.connectionState == ConnectionState.done) {
+          return const MaterialApp();
+        }
 
-  @override
-  State<HomeWidget> createState() => _HomeWidgetState();
-}
-
-class _HomeWidgetState extends State<HomeWidget> {
-  int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: Discover',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 1: Search',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 2: Organize A Show',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 3: My Profile',
-      style: optionStyle,
-    ),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('banded',
-            style: TextStyle(fontFamily: 'Garamond', fontSize: 35)),
-        foregroundColor: Colors.black,
-        backgroundColor: Colors.red,
-      ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Discover',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Organize',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'My Stuff',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        unselectedItemColor: Colors.grey[800],
-        selectedItemColor: Colors.red,
-        onTap: _onItemTapped,
-      ),
+        // Otherwise, show something whilst waiting for initialization to complete
+        return const Text('loading', textDirection: TextDirection.ltr);
+      },
     );
   }
 }
