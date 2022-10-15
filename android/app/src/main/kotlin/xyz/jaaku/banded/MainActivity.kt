@@ -1,4 +1,4 @@
-package com.example.banded
+package xyz.jaaku.banded
 
 import io.flutter.embedding.android.FlutterActivity
 
